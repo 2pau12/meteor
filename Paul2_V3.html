@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paul2</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E⚡%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#f3f6f4;--card:#fff;--ink:#14231f;--mut:#617370;--acc:#0e9f9b;--warm:#ff7a3d;--line:#dbe4e0;--ok:#1f9d55;--bad:#d64545;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1514;--card:#17211f;--ink:#e9f2ef;--mut:#8fa5a0;--line:#26332f}}
+:root[data-theme="dark"]{--bg:#0e1514;--card:#17211f;--ink:#e9f2ef;--mut:#8fa5a0;--line:#26332f}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Trebuchet MS",system-ui,sans-serif}
+button{font-family:inherit}
+[hidden]{display:none!important}
+#app{max-width:720px;margin:0 auto;padding:18px 16px 32px}
+h1{margin:0 0 4px;font-size:32px}.sub{color:var(--mut);font-size:14px}
+#back{background:none;border:0;color:var(--acc);font-size:16px;cursor:pointer;padding:6px 0}
+#tt{margin:6px 0 14px}
+.hud{display:flex;justify-content:space-between;margin-bottom:10px;color:var(--mut)}.hud b{color:var(--ink);font-size:22px}
+.pad{width:100%;height:min(46vh,320px);border-radius:20px;border:0;color:#fff;background:var(--acc);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;user-select:none;-webkit-user-select:none;touch-action:manipulation;cursor:pointer}
+.pad b{font-size:36px}.pad span{font-size:16px;opacity:.9}
+.pad.wait{background:var(--bad)}.pad.go{background:var(--ok)}.pad.early{background:#e08a1e}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;min-height:30px}.chips i{font-style:normal;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:14px}
+#arena{position:relative;height:min(60vh,380px);border-radius:18px;background:var(--card);border:2px solid var(--line);touch-action:none;overflow:hidden;cursor:crosshair;user-select:none;-webkit-user-select:none}
+.tgt{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff 0 18%,var(--warm) 19% 45%,#fff 46% 62%,var(--warm) 63%);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#111;cursor:pointer;touch-action:none}
+.tgt.first{background:var(--acc);color:#fff}
+.res{text-align:center;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:28px 16px}
+.res .lab{color:var(--mut)}.res .val{font-size:56px;font-weight:700;margin:6px 0}.res .rate{font-size:20px;font-weight:700;color:var(--acc)}.res .nb{color:var(--warm);font-weight:700;margin-top:6px}.res .sub{margin-top:6px}
+.btn{margin-top:18px;padding:12px 24px;border-radius:14px;border:2px solid var(--acc);background:var(--acc);color:#fff;font-size:18px;font-weight:600;cursor:pointer}
+#stage{text-align:center}
+.big{font-size:44px;font-weight:700;text-align:center;margin:26px 0;word-break:break-all;letter-spacing:2px}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden}.bar #bf{height:100%;width:100%;background:var(--acc);transition:width linear}
+.inp{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:28px;text-align:center;margin:10px 0}
+.row2{display:flex;gap:12px}.row2 .btn{flex:1}
+.wrap .sub{margin:10px 0}
+.big.wd{font-size:clamp(26px,8vw,40px);letter-spacing:0;word-break:normal}
+#test{max-width:560px;margin:0 auto}
+.hero{padding:10px 0 4px}.hero h1{font-size:42px;font-weight:800;letter-spacing:.5px;margin:0;background:linear-gradient(110deg,#0a3d91 0%,#1e6fff 28%,#8ad4ff 44%,#fff 50%,#8ad4ff 56%,#1e6fff 72%,#0a3d91 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3.5s linear infinite;filter:drop-shadow(0 2px 8px rgba(30,111,255,.45))}
+@keyframes shine{from{background-position:150% 0}to{background-position:-50% 0}}
+@media (prefers-reduced-motion:reduce){.hero h1{animation:none}}
+.pill{display:inline-block;margin-top:12px;padding:4px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;color:var(--mut)}
+.cat{margin:26px 0 10px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--c);display:flex;align-items:center;gap:10px}.cat:after{content:"";flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;color:var(--ink);font-size:16px;cursor:pointer;min-height:158px;transition:transform .15s,border-color .15s}
+.tile:hover,.tile:focus-visible{border-color:var(--c);transform:translateY(-2px)}
+.tile .ic{width:46px;height:46px;border-radius:14px;background:var(--line);background:color-mix(in srgb,var(--c) 18%,transparent);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:6px}
+.tile b{font-size:17px}.tile small{color:var(--mut);font-size:13px;line-height:1.3;flex:1}
+.tile em{font-style:normal;font-size:13px;font-weight:700;color:var(--c)}.tile em.none{color:var(--mut);font-weight:400}
+.disp{font-size:34px;font-weight:700;min-height:48px;margin:6px 0;letter-spacing:2px;word-break:break-all}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:320px;margin:0 auto}
+.key{padding:14px 0;font-size:24px;font-weight:600;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.key:active{background:var(--line)}.key.ok{background:var(--acc);border-color:var(--acc);color:#fff}
+.sq{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:340px;margin:12px auto}
+.sqt{aspect-ratio:1;border-radius:16px;border:2px solid var(--line);background:var(--card);cursor:pointer;touch-action:manipulation}
+.sqt.lit{background:var(--acc);border-color:var(--acc);box-shadow:0 0 22px var(--acc)}.sqt.bad{background:var(--bad);border-color:var(--bad)}
+#ttext{position:relative;text-align:left;font-size:18px;line-height:1.6;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px;max-height:min(34vh,200px);overflow:auto;margin-bottom:10px}
+#ttext .ok{color:var(--ok)}#ttext .bad{color:var(--bad);background:#d6454533}#ttext .cur{background:var(--acc);color:#fff;border-radius:3px}
+#tin{width:100%;box-sizing:border-box;padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;font-family:inherit;resize:none}
+
+.ttl{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.lang{display:flex;border:2px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{border:0;background:var(--card);color:var(--mut);padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.lang .on{background:var(--acc);color:#fff}
+.rng{display:flex;gap:12px;justify-content:center;margin:12px 0}.rng label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--mut)}
+.rng input{width:100px;padding:10px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;text-align:center}
+.chk{display:flex;gap:8px;justify-content:center;align-items:center;margin:8px 0;font-size:15px}.err{color:var(--bad);min-height:18px}
+.fc{width:100%;height:380px;perspective:1000px;background:none;border:0;padding:0;cursor:pointer}
+.fci{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}.fc.flip .fci{transform:rotateY(180deg)}
+.fcf,.fcb{position:absolute;inset:0;border-radius:20px;border:2px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;color:var(--ink)}
+.fcb{transform:rotateY(180deg);overflow:auto;text-align:center}.fcn{color:var(--mut);font-size:15px}.fcl{font-size:32px;font-weight:700}.fct{font-size:26px;font-weight:700;color:var(--acc)}
+.fcy{display:inline-block;padding:3px 12px;border-radius:999px;background:var(--line);font-size:13px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div id="app">
+<section id="home">
+<div class="hero"><div class="ttl"><h1>Paul2</h1><div class="lang" role="group" aria-label="Language"><button type="button" data-l="en" class="on">English</button><button type="button" data-l="nl">Nederlands</button></div></div><div class="sub">Eight tests for your reflexes, memory and speed, plus Latin and Greek vocabulary trainers</div><span class="pill" id="prog"></span></div>
+<div id="cards"></div>
+</section>
+<section id="test" hidden>
+<button id="back" type="button">&larr; All tests</button>
+<h2 id="tt"></h2><div id="stage"></div>
+</section>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const LS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let stop=()=>{},cur=0,kh=null;
+const T=[
+{id:'rx',name:'Reaction Time',icon:'⚡',d:'Click as soon as the screen turns green (5 tries)',lower:true,fmt:v=>v+' ms',run:reaction,
+ rate:v=>v<200?'Lightning fast':v<250?'Great':v<300?'Good':v<400?'Average':'Slow. Keep practicing'},
+{id:'cl',name:'Click Speed',icon:'🖱️',d:'How many clicks in 10 seconds',lower:false,fmt:v=>v.toFixed(1)+' CPS',run:clicks,
+ rate:v=>v>=8?'Elite':v>=6?'Fast':v>=4.5?'Good':'Warm up and try again'},
+{id:'aim',name:'Aim Trainer',icon:'🎯',d:'Hit 20 targets as fast and as accurately as you can',lower:true,fmt:v=>v+' ms',run:aim,
+ rate:v=>v<600?'Sharpshooter':v<800?'Great':v<1000?'Good':'Keep practicing'},
+{id:'num',name:'Number Memory',icon:'🔢',d:'Remember longer and longer numbers',lower:false,fmt:v=>v+(v===1?' digit':' digits'),run:numMem,
+ rate:v=>v>=12?'Superb memory':v>=9?'Great':v>=7?'Good':'Keep training'},
+{id:'word',name:'Word Memory',icon:'📖',d:'Say if each difficult word is new or one you have already seen',lower:false,fmt:v=>v+(v===1?' word':' words'),run:wordMem,
+ rate:v=>v>=40?'Superb memory':v>=25?'Great':v>=15?'Good':'Keep training'},
+{id:'math',name:'Math Speed',icon:'➗',d:'Answer 10 quick math problems as fast as you can',lower:true,fmt:v=>(v/1000).toFixed(1)+' s',run:mathSpeed,
+ rate:v=>v<=25000?'Mental calculator':v<=40000?'Great':v<=60000?'Good':'Keep practicing'},
+{id:'seq',name:'Sequence Memory',icon:'🧩',d:'Repeat a pattern of lighting tiles',lower:false,fmt:v=>v+(v===1?' level':' levels'),run:seqMem,
+ rate:v=>v>=12?'Superb memory':v>=9?'Great':v>=6?'Good':'Keep training'},
+{id:'typ',name:'Typing Speed',icon:'⌨️',d:'Type about 60 words. The text changes every time',lower:false,fmt:v=>v+' WPM',run:typing,
+ rate:v=>v>=70?'Lightning typist':v>=50?'Great':v>=35?'Good':'Keep practicing'},
+{id:'lat',name:'Latin Vocabulary',icon:'🏛️',d:'Flashcards from the Pegasus school book',note:'Pegasus 1 · 601–688',run:latin},
+{id:'grk',name:'Greek Vocabulary',icon:'🏺',d:'Flashcards from the Mythoi school book',note:'Mythoi · 1–121',run:greek}
+];
+const CATS=[['Reflexes','#0e9f9b'],['Memory','#8b5cf6'],['Speed & skill','#ff7a3d'],['Learn','#3b82f6']],CATID={rx:0,cl:0,aim:0,num:1,word:1,seq:1,math:2,typ:2,lat:3,grk:3};
+T.forEach(t=>t.cat=CATID[t.id]);
+T.forEach(t=>t.best=LS.get('reflex-'+t.id));
+
+function cards(){$('#cards').innerHTML=CATS.map((c,ci)=>'<h3 class="cat" style="--c:'+c[1]+'">'+c[0]+'</h3><div class="grid">'+
+T.map((t,i)=>t.cat!==ci?'':'<button class="tile" type="button" data-i="'+i+'" style="--c:'+c[1]+'"><span class="ic">'+t.icon+'</span><b>'+t.name+'</b><small>'+t.d+'</small>'+
+(t.note?'<em class="none">'+t.note+'</em>':t.best==null?'<em class="none">Not tried yet</em>':'<em>Best: '+t.fmt(t.best)+'</em>')+'</button>').join('')+'</div>').join('');
+$('#prog').textContent=T.filter(t=>!t.note&&t.best!=null).length+' of '+T.filter(t=>!t.note).length+' tests tried'}
+function run(i){stop();stop=()=>{};dropKh();cur=i;$('#home').hidden=true;$('#test').hidden=false;$('#tt').textContent=T[i].name;T[i].run()}
+function home(){stop();stop=()=>{};dropKh();$('#test').hidden=true;$('#home').hidden=false;cards()}
+function result(i,val,detail){const t=T[i],prev=t.best,nb=prev==null||(t.lower?val<prev:val>prev);if(nb){t.best=val;LS.set('reflex-'+t.id,val)}
+$('#stage').innerHTML='<div class="res"><div class="lab">'+t.name+'</div><div class="val">'+t.fmt(val)+'</div><div class="rate">'+t.rate(val)+'</div>'+
+(nb?'<div class="nb">New best!</div>':'<div class="sub">Best: '+t.fmt(prev)+'</div>')+'<div class="sub">'+detail+'</div><button class="btn" id="again" type="button">Try again</button></div>';
+$('#again').onclick=()=>run(i)}
+
+function reaction(){let tries=[],st='idle',t0,to;const el=$('#stage');
+function view(cls,big,small){el.innerHTML='<button id="pad" class="pad '+cls+'" type="button"><b>'+big+'</b><span>'+small+'</span></button><div class="chips">'+tries.map(t=>'<i>'+t+' ms</i>').join('')+'</div>';
+$('#pad').onpointerdown=press;$('#pad').onclick=e=>{if(e.detail===0)press()}}
+function arm(){st='wait';view('wait','Wait for green…','Don\'t click yet');to=setTimeout(()=>{st='go';t0=performance.now();view('go','Click!','')},1500+Math.random()*3500)}
+function press(){if(st==='wait'){clearTimeout(to);st='early';view('early','Too soon!','Click to try again')}
+else if(st==='go'){const ms=Math.round(performance.now()-t0);tries.push(ms);
+if(tries.length===5)return result(0,Math.round(tries.reduce((a,b)=>a+b)/5),'Your 5 tries: '+tries.join(', ')+' ms');
+st='between';view('',ms+' ms','Click for the next try ('+tries.length+'/5)')}
+else arm()}
+stop=()=>clearTimeout(to);view('','Click to start','Click when the screen turns green')}
+
+function clicks(){const D=10;let n=0,st='idle',t0,iv,to;
+$('#stage').innerHTML='<div class="hud"><span>Time <b id="tm">'+D.toFixed(1)+'</b>s</span><span>Clicks <b id="ct">0</b></span></div><button id="pad" class="pad" type="button"><b>Click here</b><span>The timer starts on your first click</span></button>';
+const pad=$('#pad');
+function press(){if(st==='idle'){st='run';t0=performance.now();iv=setInterval(()=>{$('#tm').textContent=Math.max(0,D-(performance.now()-t0)/1000).toFixed(1)},50);to=setTimeout(end,D*1000);
+pad.querySelector('b').textContent='Keep clicking!';pad.querySelector('span').textContent=''}
+if(st==='run'){n++;$('#ct').textContent=n}}
+function end(){st='done';stop();result(1,Math.round(n/D*10)/10,n+' clicks in '+D+' seconds')}
+pad.onpointerdown=press;pad.onclick=e=>{if(e.detail===0)press()};
+stop=()=>{clearInterval(iv);clearTimeout(to)}}
+
+function aim(){const N=20;let started=false,hits=0,miss=0,tot=0,t0;
+$('#stage').innerHTML='<div class="hud"><span>Targets <b id="ah">0</b>/'+N+'</span><span>Misses <b id="am">0</b></span></div><div id="arena"></div>';
+const ar=$('#arena');
+function spawn(first){const r=ar.getBoundingClientRect(),d=Math.min(56,r.width/6),t=document.createElement('div');
+t.className='tgt'+(first?' first':'');t.style.width=t.style.height=d+'px';t.style.left=Math.random()*(r.width-d)+'px';t.style.top=Math.random()*(r.height-d)+'px';if(first)t.textContent='Start';
+t.onpointerdown=e=>{e.stopPropagation();t.remove();if(first)started=true;else{tot+=performance.now()-t0;hits++;$('#ah').textContent=hits}
+if(hits===N)return end();t0=performance.now();spawn(false)};ar.appendChild(t)}
+ar.onpointerdown=()=>{if(started){miss++;$('#am').textContent=miss}};
+function end(){const sc=Math.round((tot+miss*250)/N),acc=Math.round(N/(N+miss)*100);
+result(2,sc,'Average hit time '+Math.round(tot/N)+' ms · '+miss+' misses · '+acc+'% accuracy. Each miss adds 250 ms to your score.')}
+spawn(true)}
+
+function intro(name,text,go){$('#stage').innerHTML='<div class="res wrap"><div class="lab">'+name+'</div><div class="sub">'+text+'</div><button class="btn" id="go" type="button">Start</button></div>';$('#go').onclick=go}
+
+function dropKh(){if(kh){removeEventListener('keydown',kh);kh=null}}
+function keypad(host,onOk,max){let v='';dropKh();
+host.innerHTML='<div class="disp" id="disp">&nbsp;</div><div class="keys">'+[1,2,3,4,5,6,7,8,9,'⌫',0,'OK'].map(k=>'<button type="button" class="key'+(k==='OK'?' ok':'')+'" data-k="'+k+'">'+k+'</button>').join('')+'</div>';
+const draw=()=>{$('#disp').textContent=v||'\u00a0'};
+const press=k=>{if(k==='OK'){if(v!=='')onOk(v);return}if(k==='⌫')v=v.slice(0,-1);else if(v.length<max)v+=k;draw()};
+host.querySelector('.keys').onpointerdown=e=>{const b=e.target.closest('[data-k]');if(b){e.preventDefault();press(b.dataset.k)}};
+kh=e=>{if(/^[0-9]$/.test(e.key))press(e.key);else if(e.key==='Backspace')press('⌫');else if(e.key==='Enter')press('OK')};
+addEventListener('keydown',kh);return()=>{v='';draw()}}
+
+function numMem(){let lv=1,num='',to;const el=$('#stage');
+function show(){num='';for(let i=0;i<lv;i++)num+=i?Math.floor(Math.random()*10):1+Math.floor(Math.random()*9);
+const ms=800+lv*600;el.innerHTML='<div class="hud"><span>Level <b>'+lv+'</b></span></div><div class="big">'+num+'</div><div class="bar"><div id="bf" style="transition-duration:'+ms+'ms"></div></div>';
+requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=$('#bf');if(f)f.style.width='0'}));to=setTimeout(ask,ms)}
+function ask(){el.innerHTML='<div class="hud"><span>Level <b>'+lv+'</b></span></div><div class="sub">What was the number?</div><div id="kp"></div>';keypad($('#kp'),check,30)}
+function check(v){dropKh();if(v===num){lv++;show()}else result(3,lv-1,'The number was '+num+'. You typed '+v+'.')}
+stop=()=>clearTimeout(to);
+intro('Number Memory','A number appears and then disappears. Type it back. It gets one digit longer every level.',show)}
+
+const WORDS=[...new Set(('ephemeral ubiquitous obsequious pernicious sycophant querulous perfunctory recalcitrant magnanimous equivocal ostentatious vicarious laconic pugnacious lugubrious ineffable mellifluous propitious surreptitious sanguine truculent venerable zealous abstruse acrimonious alacrity ameliorate anachronism antithesis apocryphal arcane assuage auspicious avarice belligerent bucolic cacophony capricious caustic circumspect clandestine cogent commensurate conundrum corroborate credulous cryptic debacle deleterious denouement desultory diatribe dichotomy didactic diffident disparate dogmatic ebullient eclectic efficacious egregious elucidate empirical enervate equanimity erudite esoteric euphemism exacerbate exculpate fastidious fatuous fecund florid fulminate garrulous gregarious hapless harbinger hegemony iconoclast idiosyncrasy impecunious inchoate incongruous indolent inexorable insipid intransigent inveterate irascible jocular juxtaposition kowtow lachrymose languid loquacious maelstrom malleable mendacious meticulous mercurial nebulous nefarious obdurate obfuscate onerous opprobrium ostracize palliative panacea paradigm parsimonious pedantic penchant perspicacious pithy platitude plethora pragmatic prevaricate quixotic quotidian rancorous recondite redolent reticent sagacious salient sardonic scrupulous serendipity soporific spurious stoic stolid supercilious taciturn tenacious tenuous torpid trepidation umbrage unctuous vacillate vapid verbose vitriolic voracious wistful zeitgeist').split(' '))];
+function wordMem(){const seen=new Set();let strikes=0,score=0,w;const el=$('#stage');
+function next(){const unseen=WL().filter(x=>!seen.has(x)),useSeen=seen.size&&(Math.random()<.5||!unseen.length);
+w=useSeen?[...seen][Math.random()*seen.size|0]:unseen[Math.random()*unseen.length|0];
+el.innerHTML='<div class="hud"><span>Score <b>'+score+'</b></span><span>Lives <b>'+'♥'.repeat(3-strikes)+'♡'.repeat(strikes)+'</b></span></div><div class="sub">Have you seen this word in this game?</div><div class="big wd">'+w+'</div><div class="row2"><button class="btn" id="s" type="button">Seen</button><button class="btn" id="n" type="button">New</button></div>';
+$('#s').onclick=()=>ans(true);$('#n').onclick=()=>ans(false)}
+function ans(sayS){const was=seen.has(w);seen.add(w);if(sayS===was)score++;else strikes++;
+if(strikes>=3)return result(4,score,'You ran out of lives. You saw '+seen.size+' different words.');next()}
+intro('Word Memory','Difficult words appear one at a time. Say whether you have seen each word before in this game or whether it is new. Three mistakes and you are out.',next)}
+
+function mathSpeed(){const N=10;let i=0,wrong=0,t0,q,iv,clr;const el=$('#stage');
+function gen(){const o=['+','−','×','÷'][Math.random()*4|0],r=n=>1+Math.random()*n|0;let a,b,ans;
+if(o==='+'){a=r(89)+10;b=r(89)+10;ans=a+b}else if(o==='−'){a=r(89)+10;b=r(a-1);ans=a-b}else if(o==='×'){a=r(11)+1;b=r(11)+1;ans=a*b}else{b=r(11)+1;ans=r(11)+1;a=b*ans}
+return{t:a+' '+o+' '+b,ans}}
+function show(){q=gen();$('#q').textContent=q.t+' = ?';$('#qn').textContent=i+1}
+function submit(v){if(+v!==q.ans)wrong++;i++;if(i===N)return fin();clr();show()}
+function fin(){dropKh();clearInterval(iv);const ms=performance.now()-t0;result(5,Math.round(ms+wrong*3000),'Average: <b>'+(ms/N/1000).toFixed(2)+' s</b> per problem<br>'+(N-wrong)+'/'+N+' correct · '+(ms/1000).toFixed(1)+' s plus '+wrong+' wrong × 3 s penalty')}
+function start(){i=0;wrong=0;t0=performance.now();
+el.innerHTML='<div class="hud"><span>Question <b id="qn">1</b>/'+N+'</span><span>Time <b id="tm">0.0</b>s</span></div><div class="big" id="q"></div><div id="kp"></div>';
+iv=setInterval(()=>{const t=$('#tm');if(t)t.textContent=((performance.now()-t0)/1000).toFixed(1)},100);clr=keypad($('#kp'),submit,6);show()}
+stop=()=>clearInterval(iv);
+intro('Math Speed','Answer 10 quick problems (add, subtract, multiply, divide). Your time counts, and each wrong answer adds 3 seconds.',start)}
+
+function seqMem(){const el=$('#stage');let seq=[],pos=0,busy=true,to=[];
+const later=(f,ms)=>{to.push(setTimeout(f,ms))};
+function build(){el.innerHTML='<div class="hud"><span>Level <b id="lv">1</b></span><span id="st" class="sub">Watch</span></div><div class="sq">'+[...Array(9).keys()].map(i=>'<button type="button" class="sqt" data-t="'+i+'" aria-label="Tile '+(i+1)+'"></button>').join('')+'</div>';
+$('.sq').onpointerdown=e=>{const b=e.target.closest('[data-t]');if(b&&!busy){e.preventDefault();tap(+b.dataset.t)}}}
+function flash(i,ms,c){const b=document.querySelector('[data-t="'+i+'"]');if(!b)return;b.classList.add(c||'lit');later(()=>b.classList.remove(c||'lit'),ms)}
+function play(){busy=true;pos=0;$('#lv').textContent=seq.length;$('#st').textContent='Watch';
+seq.forEach((t,k)=>later(()=>flash(t,420),600+k*700));later(()=>{busy=false;$('#st').textContent='Your turn'},600+seq.length*700)}
+function next(){seq.push(Math.random()*9|0);play()}
+function tap(t){if(t!==seq[pos]){busy=true;flash(t,350,'bad');const n=seq.length-1;return later(()=>result(6,n,'You repeated '+n+(n===1?' step':' steps')+' correctly before the first mistake.'),500)}
+flash(t,200);pos++;if(pos===seq.length){busy=true;later(next,700)}}
+stop=()=>to.forEach(clearTimeout);
+intro('Sequence Memory','Tiles light up one at a time. Repeat the order by tapping them. Each level adds one more tile.',()=>{build();next()})}
+
+const SENT=['The quick breeze carried the smell of fresh bread down the quiet street.','A tiny robot rolled across the kitchen floor looking for a missing battery.','Every morning she walked to the old harbor to watch the fishing boats return.','Learning to type quickly takes patience, practice, and a surprising amount of coffee.','The library was silent except for the soft turning of pages and distant footsteps.','When the storm finally passed, the whole valley glittered under a clear blue sky.','He packed a small notebook, two sandwiches, and a map that nobody else could read.','Clouds drifted slowly over the mountains while the village slept without a single sound.','The scientist carefully measured each drop before adding it to the glowing mixture.','A curious fox peeked out from the tall grass and then vanished into the woods.','Good habits are built one small step at a time, long before anyone notices them.','The train rattled through the tunnel and came out into a field of bright yellow flowers.','She laughed so hard at the joke that her tea nearly spilled across the table.','Under the old oak tree, the children built a castle out of sticks and leaves.','The market was crowded with people comparing prices, tasting fruit, and sharing local news.','At midnight the city lights flickered on one by one like scattered stars.','He practiced the same song for weeks until his fingers knew every note by heart.','The ship sailed past the lighthouse just as the first rays of sunrise appeared.','A friendly neighbor left a basket of ripe apples on the porch every autumn.','The puzzle looked impossible at first, but small patterns soon began to appear.','Winter arrived early this year, covering the roofs and roads with soft white snow.','The chef tasted the soup, added a pinch of salt, and smiled with satisfaction.','Rain tapped gently on the window while the cat slept in a warm patch of light.','They followed the winding trail up the hill and stopped to admire the view.','The old clock in the hall chimed twice and then fell quiet again.','A brave little sparrow built its nest in the corner of the busy station.','She wrote her goals on a card and kept it in her pocket all year.','The bakery on the corner opens before dawn, filling the air with sweet warm scents.','Strong teams listen carefully, share ideas openly, and celebrate small victories together.','The astronaut floated beside the window and watched the blue planet turn below.','After a long day of work, nothing feels better than a quiet walk by the river.','The little boat bobbed up and down as waves rolled gently toward the shore.','He found an old photograph tucked between the pages of a dusty book.','The orchestra tuned their instruments, and a hush fell over the crowded hall.','Fresh paint, bright curtains, and a few plants made the empty room feel like home.','The detective studied the footprints and realized they led straight back to the garden gate.','Our class planted a row of tomatoes and watered them faithfully every single afternoon.','In the distance, thunder rolled across the plains as the cattle moved toward the barn.','She kept a jar of marbles on her desk to remind her of summer.','The mountain path was steep and narrow, but the sunrise made every step worthwhile.'];
+function typing(){const el=$('#stage');let text='',spans=[],t0=0,iv=0,done=false;
+function build(){const pool=SL().map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]),pick=[];let wc=0;
+for(const s of pool){pick.push(s);wc+=s.split(' ').length;if(wc>=60)break}text=pick.join(' ');
+el.innerHTML='<div class="hud"><span>Time <b id="tm">0.0</b>s</span><span>WPM <b id="wp">0</b></span><span>Accuracy <b id="ac">100</b>%</span></div><div id="ttext">'+[...text].map(c=>'<span>'+c+'</span>').join('')+'</div><textarea id="tin" rows="2" placeholder="Start typing here…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>';
+spans=[...document.querySelectorAll('#ttext span')];const ta=$('#tin');ta.onpaste=e=>e.preventDefault();ta.oninput=upd;ta.focus();upd()}
+function stats(){const v=$('#tin').value;let ok=0;for(let i=0;i<v.length&&i<text.length;i++)if(v[i]===text[i])ok++;return{v,ok}}
+function upd(){if(done)return;const{v,ok}=stats();if(!t0&&v.length){t0=performance.now();iv=setInterval(tick,200)}
+spans.forEach((s,i)=>{s.className=i<v.length?(v[i]===text[i]?'ok':'bad'):i===v.length?'cur':''});
+const c=spans[Math.min(v.length,spans.length-1)],box=$('#ttext');box.scrollTop=Math.max(0,c.offsetTop-box.clientHeight/2);
+$('#ac').textContent=v.length?Math.round(ok/v.length*100):100;if(v.length>=text.length)finish()}
+function tick(){const{ok}=stats(),sec=(performance.now()-t0)/1000;$('#tm').textContent=sec.toFixed(1);$('#wp').textContent=sec>3?Math.round(ok/5/(sec/60)):'…'}
+function finish(){done=true;clearInterval(iv);const{v,ok}=stats(),min=(performance.now()-t0)/60000;
+result(7,Math.round(ok/5/min),text.split(' ').length+' words in '+(min*60).toFixed(1)+' s · accuracy '+Math.round(ok/v.length*100)+'%')}
+stop=()=>clearInterval(iv);
+intro('Typing Speed','About 60 words appear and the text is different every time. The timer starts when you type your first letter. Wrong letters count against your accuracy, and your score is words per minute.',build)}
+
+/* ---- Latin vocabulary (Pegasus 1, 601-688) ---- */
+const VOC=`inferus|~a, ~um|laaggelegen|low-lying||||
+appropinquāre|appropinquō|naderen|to approach|c1|||
+spērāre|spērō|hopen op|to hope for|c1|||
+dēspērāre|dēspērō|wanhopen|to despair|c1|||
+obsīdēre|obsideō|belegeren; bezet houden|to besiege; to keep occupied|c2|||
+prōmittere|prōmittō|beloven|to promise|c3|Fr. promettre||
+scrībere|scrībō|schrijven|to write|c3|||
+ōlim||eens|once; at one time|adv|||
+victor|victōr-is, m.|de overwinnaar|the victor||Lat.||
+alter|altera, alterum|de andere|the other||||
+alter … alter||de ene … de andere|the one … the other||||
+plūrimī|~ae, ~a|zeer veel|very many||||
+tantus|~a, ~um|zo groot|so great; so big||||
+vexāre|vexō|kwellen|to torment|c1||Sommige mensen worden gekweld door aanhoudende hoofdpijn.|Some people are tormented by persistent headaches.
+exercēre|exerceō|oefenen|to practise|c2|Fr. l’exercice||
+initium|initiī|het begin|the beginning||Lat. Ndl. het initiatief||
+iūdicium|iūdiciī|het oordeel; het proces|the judgment; the trial||Lat.||
+rēgnum|rēgnī|het koninkrijk; de heerschappij|the kingdom; the rule|||De oorlog maakt een eind aan de heerschappij van de koning.|The war puts an end to the rule of the king.
+signum|signī|het teken|the sign||Ndl.||
+gēns|gentis, v.|het geslacht; de volksstam|the clan; the tribe|||De koning behoort tot een adellijk geslacht.|The king belongs to a noble lineage.
+sēdēs|sēd-is, v.|de zitplaats; de verblijfplaats|the seat; the residence||Lat.||
+certāmen|certāmin-is, o.|de wedstrijd|the contest||||
+pectus|pector-is, o.|de borst; het hart; het verstand|the chest; the heart; the mind||||
+currus|currūs, m.|de renwagen|the chariot||Lat.||
+cursus|cursūs, m.|de loop; de koers|the course; the run||Lat.|Het schip wijzigt zijn koers.|The ship changes its course.
+metus|metūs, m.|de vrees|the fear||Lat.||
+fidēs|fideī, v.|de trouw; het vertrouwen; het gegeven woord|the loyalty; the trust; the given word||||
+spēs|speī, v.|de hoop|the hope||Lat.||
+singulī|~ae, ~a|elk één; afzonderlijk|one each; individually||Fr. singulier||
+dulcis|~, dulce; dulc-is|zoet; lief|sweet; dear||||
+tot||zoveel|so many|indadj|||
+certāre|certō|strijden|to fight; to contend|c1|Lat.||
+pervenīre|perveniō|aankomen|to arrive|c4|Lat. per +||
+simul||tegelijk|at the same time|adv|||
+quamquam||hoewel|although|conj|||
+fructus|fructūs, m.|de vrucht|the fruit||||
+rēs|reī, v.|de zaak|the thing; the matter||Ndl.||
+domus|domūs, v.|het huis|the house||||
+manus|manūs, v.|de hand; de groep|the hand; the group||Ndl. de manicure Fr. la main||
+cāsus|cāsūs|de val; het voorval; het toeval|the fall; the event; the chance||Lat.||
+ēventus|ēventūs|de afloop|the outcome||Lat. e +||
+exercitus|exercitūs|het leger|the army||Lat.||
+magistrātus|magistrātūs|het ambt; de magistraat|the office; the magistrate||||
+passus|passūs|de pas (als lengtemaat: 1,5 m)|the pace (as a unit of length: 1.5 m)||||
+senātus|senātūs|de senaat|the senate||||
+tumultus|tumultūs|het tumult|the uproar|||Hooligans veroorzaken tumult in het stadion.|Hooligans cause an uproar in the stadium.
+vultus|vultūs|het gezicht|the face||||
+diēs|diēī, m. / v.|de dag|the day||||
+faciēs|faciēī|het gezicht; het uitzicht|the face; the appearance||Fr. la façade / Eng. the face||
+aliēnus|~a, ~um|van een ander; vreemd|belonging to another; foreign||Eng. alien||
+dexter|dextra, dextrum|rechts|right||Lat.||
+rēgius|~a, ~um|koninklijk|royal||Lat.||
+familiāris|~, familiāre; familiār-is|van het gezin; goede bekende|of the family; a close acquaintance||Lat.||
+turpis|~, turpe; turp-is|lelijk; schandelijk|ugly; shameful||||
+alere|alō|voeden|to feed|c3|||
+committere|committō|begaan; toevertrouwen; beginnen|to commit; to entrust; to begin|c3||Hij begaat een zware misdaad.|He commits a serious crime.
+fallere|fallō|misleiden; ontgaan|to deceive; to escape the notice of|c3|Ndl. vals|De fout is me ontgaan.|The mistake escaped me.
+pellere|pellō|verdrijven|to drive away|c3|Lat.||
+statuere|statuō|plaatsen; vaststellen; beslissen|to place; to establish; to decide|c3|Ndl. de traditie||
+trādere|trādō|overhandigen; toevertrouwen|to hand over; to entrust|c3|||
+īnferī|īnferōrum|de onderwereld|the underworld||Lat.||
+marītus|marītī|de echtgenoot|the husband||Fr. le mari||
+morbus|morbī|de ziekte|the disease||||
+mēnsis|mēns-is, m.|de maand|the month||||
+aetās|aetāt-is, v.|de leeftijd; de periode|the age; the period||||
+suādēre|suādeō|aanraden|to advise|c2|||
+carpere|carpō|plukken|to pluck|c3|||
+claudere|claudō|sluiten|to close|c3|Ndl. de claustrofobie||
+crēscere|crēscō|groeien|to grow|c3|Ndl. crescendo||
+occīdere|occīdō|doden|to kill|c3|Lat.||
+prōcēdere|prōcēdō|vooruitgaan|to advance|c3|Lat. Ndl.||
+tangere|tangō|aanraken; bereiken; treffen|to touch; to reach; to hit|c3|||
+prōdesse|prōsum|nuttig zijn|to be useful|irr|Lat. pro +||
+perīre|pereō|ten onder gaan|to perish|irr|Lat. per +|In 476 gaat het West-Romeinse Rijk ten onder.|In 476 the Western Roman Empire falls.
+quandō?||wanneer?|when?|adv|Fr. quand?||
+rūrsus||opnieuw|again|adv|||
+somnium|somniī|de droom|the dream||||
+imber|imbr-is, m.|de regenbui|the rain shower||||
+tālis|~, tāle; tāl-is|zodanig|such||||
+īdem|eadem, idem; eiusdem|dezelfde, hetzelfde|the same||||
+haud||helemaal niet|not at all|adv|||
+inde||vandaar; daarna; daarom|from there; then; therefore|adv|||
+plērumque||meestal|mostly|adv|||
+hic|haec, hoc; huius|deze, dit|this||||
+iste|ista, istud; istius|die, dat|that||||
+ille|illa, illud; illīus|die, dat; hij, zij|that; he, she||Fr. il, elle; le, la||
+epistula|epistulae|de brief|the letter||||
+praetereā||bovendien|moreover|adv|||`.split('\n').map(l=>l.split('|'));
+const TY={c1:['1st conjugation','1e conjugatie'],c2:['2nd conjugation','2e conjugatie'],c3:['3rd conjugation','3e conjugatie'],c4:['4th conjugation','4e conjugatie'],adv:['Adverb','Bijwoord'],conj:['Conjunction','Voegwoord'],indadj:['Indeclinable adjective','Onverbuigbaar adjectief'],irr:['Irregular','Onregelmatig']};
+function vocab(c){const el=$('#stage'),lo=c.a,hi=c.b;let q=[],total=0,again=0,seen=false;
+function setup(){el.innerHTML='<div class="res wrap"><div class="lab">'+c.name+'</div><div class="sub">'+c.note+'</div><div class="rng"><label>From <input id="lf" type="number" inputmode="numeric" min="'+lo+'" max="'+hi+'" value="'+lo+'"></label><label>To <input id="lt" type="number" inputmode="numeric" min="'+lo+'" max="'+hi+'" value="'+hi+'"></label></div><label class="chk"><input id="sh" type="checkbox" checked> Shuffle the cards</label><div class="err" id="le"></div><button class="btn" id="go" type="button">Start</button></div>';$('#go').onclick=begin}
+function begin(){const a=parseInt($('#lf').value),b=parseInt($('#lt').value);if(!(a>=lo&&b<=hi&&a<=b)){$('#le').textContent='Choose numbers between '+lo+' and '+hi+'.';return}
+q=[];for(let n=a;n<=b;n++)q.push(n-lo);if($('#sh').checked)q=q.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+total=q.length;again=0;dropKh();kh=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();flip()}else if(seen&&e.key==='ArrowRight')ok();else if(seen&&e.key==='ArrowLeft')ag()};addEventListener('keydown',kh);show()}
+function show(){if(!q.length)return done();seen=false;const i=q[0],v=c.d[i],n=lo+i;
+el.innerHTML='<div class="hud"><span>Cards left <b>'+q.length+'</b></span><span class="sub">'+n+'</span></div><button class="fc" id="fc" type="button" aria-label="Flip card"><div class="fci"><div class="fcf"><span class="fcn">'+n+'</span><span class="fcl">'+v[0]+'</span></div><div class="fcb"><span class="fcn">'+n+'</span>'+c.back(v,L==='nl')+'</div></div></button><div class="sub" id="hint">Tap the card to flip</div><div class="row2" id="fcc"></div>';
+$('#fc').onclick=flip}
+function flip(){const f=$('#fc');if(!f)return;f.classList.toggle('flip');f.blur();if(!seen){seen=true;$('#hint').textContent='';$('#fcc').innerHTML='<button class="btn" id="ag" type="button">Review again</button><button class="btn" id="ok" type="button" style="background:var(--acc);color:#fff">I knew it</button>';$('#ag').onclick=ag;$('#ok').onclick=ok}}
+function ok(){q.shift();show()}
+function ag(){again++;q.push(q.shift());show()}
+function done(){dropKh();el.innerHTML='<div class="res"><div class="lab">'+c.name+'</div><div class="val">'+total+' cards</div><div class="rate">Done!</div><div class="sub">You reviewed '+total+' cards. '+again+' needed another look.</div><button class="btn" id="again" type="button">Practise again</button></div>';$('#again').onclick=()=>run(cur)}
+setup()}
+function latin(){vocab({name:'Latin Vocabulary',a:601,b:688,d:VOC,note:'The vocabulary comes from the Dutch Latin school book Pegasus. At the moment only Pegasus 1: Latin vocabulary 601–688 is available.',
+back:(v,nl)=>{const forms=nl?v[1]:v[1].replace(/\bv\./g,'f.').replace(/\bo\./g,'n.'),note=nl?v[5]:v[5].replace(/Ndl\./g,'Dutch'),ex=nl?v[6]:v[7],ty=v[4]?TY[v[4]][nl?1:0]:'';
+return(forms?'<span class="fcl" style="font-size:26px">'+forms+'</span>':'')+'<span class="fct">'+(nl?v[2]:v[3])+'</span>'+(ty?'<span class="fcy">'+ty+'</span>':'')+(note?'<span class="fcn"><i>'+note+'</i></span>':'')+(ex?'<span class="fcn"><i>'+ex+'</i></span>':'')}})}
+
+/* ---- Greek vocabulary (Mythoi, complete list 1-121) ---- */
+const GRK=`ὁ θεός|τοῦ θεοῦ / ἡ θεός, τῆς θεοῦ|de god; de godin|the god; the goddess||θε-
+ὁ ἄνθρωπος|τοῦ ἀνθρώπου|de mens|the human being||ἀνθρωπ-
+οὐ|οὐκ, οὐχ|niet|not||
+εἶναι|εἰμί|zijn|to be||εἰ-, ἐσ-
+παρεῖναι|πάρειμι|aanwezig zijn|to be present||παρ-ει-, -εσ-
+ὁ ἀδελφός|τοῦ ἀδελφοῦ / ἡ ἀδελφή, τῆς ἀδελφῆς|de broer; de zus|the brother; the sister||ἀδελφ-
+πολλοί|πολλαί, πολλά|veel, talrijk|many, numerous||πολλ-
+ἡ τέχνη|τῆς τέχνης|de vaardigheid|the skill||τεχν-
+ἄρα||vraagpartikel (blijft onvertaald: zie LWB p. 10)|question particle (stays untranslated: see LWB p. 10)||
+ὁ μῦθος|τοῦ μύθου|het verhaal|the story||μυθ-
+καί||1. en 2. ook|1. and 2. also||
+γάρ||want|for, because||
+οὖν||dus|so, therefore||
+σοφός|σοφή, σοφόν|wijs, slim|wise, clever||σοφ-
+ἐθέλειν|ἐθέλω|willen|to want, to be willing||ἐθελ-
+λέγειν|λέγω|zeggen, vertellen, spreken|to say, to tell, to speak||λεγ-
+τί;||1. wat? 2. waarom?|1. what? 2. why?||
+ὁ οὐρανός|τοῦ οὐρανοῦ|de hemel|the sky, heaven||οὐραν-
+ἡ γῆ|τῆς γῆς|1. de aarde 2. het land|1. the earth 2. the land||γ-
+ὁ ἥλιος|τοῦ ἡλίου|de zon|the sun||ἡλι-
+ὁ δοῦλος|τοῦ δούλου|de slaaf|the slave||δουλ-
+ἡ τιμή|τῆς τιμῆς|het eerbewijs, de eer|the mark of honour, the honour||τιμ-
+ὁ ξένος|τοῦ ξένου|de vreemdeling|the stranger, the foreigner||ξεν-
+τὸ δένδρον|τοῦ δένδρου|de boom|the tree||δενδρ-
+τὸ βιβλίον|τοῦ βιβλίου|het boek|the book||βιβλι-
+τὸ ζῷον|τοῦ ζῴου|1. het levend wezen 2. het dier|1. the living being 2. the animal||ζω-
+τὸ δῶρον|τοῦ δώρου|het geschenk|the gift||δωρ-
+καλός|καλή, καλόν|1. mooi 2. goed, edel|1. beautiful 2. good, noble||καλ-
+κακός|κακή, κακόν|slecht|bad||κακ-
+ἀγαθός|ἀγαθή, ἀγαθόν|goed, edel, flink|good, noble, brave||ἀγαθ-
+δεινός|δεινή, δεινόν|1. vreselijk, geducht 2. knap, geweldig|1. terrible, formidable 2. clever, impressive||δειν-
+ἐγώ|ἐμοῦ / μου|ik|I||
+σύ|σοῦ|jij|you (singular)||
+ἡμεῖς|ἡμῶν|wij|we||
+ὑμεῖς|ὑμῶν|jullie|you (plural)||
+λύειν|λύω|losmaken|to untie, to loosen||λυ-
+χαίρειν|χαίρω|blij zijn|to be glad||χαιρ-
+ἔχειν|ἔχω|1. hebben 2. houden|1. to have 2. to hold||ἐχ-
+βλέπειν|βλέπω|kijken|to look||βλεπ-
+πίνειν|πίνω|drinken|to drink||πιν-
+ἐσθίειν|ἐσθίω|eten|to eat||ἐσθι-
+βαίνειν|βαίνω|gaan|to go||βαιν-
+λείπειν|λείπω|verlaten, achterlaten|to leave, to leave behind||λειπ-
+στέργειν|στέργω|beminnen|to love, to be fond of||στεργ-
+ὁ φίλος|τοῦ φίλου / ἡ φίλη, τῆς φίλης|de vriend; de vriendin|the friend (male); the friend (female)||φιλ-
+ὁ ποταμός|τοῦ ποταμοῦ|de rivier|the river||ποταμ-
+ὁ λίθος|τοῦ λίθου|de steen|the stone||λιθ-
+ἀλλά||maar|but||
+πρός|+ acc.|naar, tot bij|to, towards, at||
+εἰς|+ acc.|naar, tot in|into, to||
+ὁ νεανίσκος|τοῦ νεανίσκου|de jongeman|the young man||νεανισκ-
+ᾄδειν|ᾄδω|zingen|to sing||ᾀδ-
+ὡς||zoals|as, like||
+ἀκούειν|ἀκούω|horen, luisteren naar|to hear, to listen to||ἀκου-
+δέ||1. en 2. maar 3. (onvertaald laten)|1. and 2. but 3. (leave untranslated)||
+μόνος|μόνη, μόνον|alleen, enig|alone, only||μον-
+θαυμάζειν|θαυμάζω|1. verwonderd zijn 2. bewonderen|1. to be amazed 2. to admire||θαυμαζ-
+ἡ ᾠδή|τῆς ᾠδῆς|het lied, het gezang|the song, the singing||ᾠδ-
+ἡ φωνή|τῆς φωνῆς|1. de stem 2. het geluid|1. the voice 2. the sound||φων-
+ἡ παιδίσκη|τῆς παιδίσκης|het meisje|the girl||παιδισκ-
+οὔτε ... οὔτε ...||noch ... noch ...|neither ... nor ...||
+οὐκέτι||niet meer|no longer||
+ὁ οἶνος|τοῦ οἴνου|de wijn|the wine||οἰν-
+βάλλειν|βάλλω|1. werpen 2. treffen|1. to throw 2. to hit||βαλλ-
+ὅδε|ἥδε, τόδε|deze, dit|this||
+φέρειν|φέρω|dragen, verdragen|to carry, to bear||φερ-
+περί|+ gen.|over|about, concerning||
+ἡ ψυχή|τῆς ψυχῆς|de ziel|the soul||ψυχ-
+ἄλλος|ἄλλη, ἄλλο|(een) ander|(an) other||ἀλλ-
+ὁ ἵππος|τοῦ ἵππου|het paard|the horse||ἱππ-
+ὁ οἶκος|τοῦ οἴκου|het huis|the house||οἰκ-
+ἄνευ|+ gen.|zonder|without||
+ὑπέρ|+ gen.|voor, ten voordele van|for, on behalf of||
+ὁ στρατηγός|τοῦ στρατηγοῦ|de aanvoerder|the commander||στρατηγ-
+ὁ υἱός|τοῦ υἱοῦ|de zoon|the son||υἱ-
+ἐκεῖ||daar|there|adv|
+ποῦ;||waar?|where?|adv|
+πρῶτον||eerst|first|adv|
+ἔπειτα||vervolgens|then, next|adv|
+τέλος||tenslotte|finally|adv|
+τὸ παιδίον|τοῦ παιδίου|het kindje|the little child||
+τὸ τέκνον|τοῦ τέκνου|(iemands) kind|(someone's) child||
+τὸ ἔργον|τοῦ ἔργου|het werk|the work||ἐργ-
+αὐτόν / -ήν / -ό|αὐτοῦ / -ῆς / -οῦ<br>αὐτούς / -άς / -ά, αὐτῶν<br>αὐτός, αὐτή, αὐτό<br>ὁ αὐτός, ἡ αὐτή, τὸ αὐτό|hem, haar, het (zelfstandig)<br>hen (zelfstandig)<br>zelf (bijvoeglijk)<br>dezelfde, hetzelfde (bijvoeglijk)|him, her, it (used on its own)<br>them (used on its own)<br>self (used as an adjective)<br>the same (used as an adjective)||αὐτ-
+εὑρίσκειν|εὑρίσκω|vinden|to find||εὑρισκ-
+ἑαυτόν / -ήν|ἑαυτοῦ / ἑαυτῆς<br>ἑαυτούς / -άς, ἑαυτῶν|zichzelf|himself, herself, itself, themselves||ἑαυτ-
+ἄγειν|ἄγω|voeren, brengen|to lead, to bring||ἀγ-
+οἱ πολέμιοι|τῶν πολεμίων|de vijanden|the enemies||πολεμι-
+πέμπειν|πέμπω|zenden|to send||πεμπ-
+ὁ λόγος|τοῦ λόγου|1. het woord 2. de mededeling|1. the word 2. the message||λογ-
+ἀεί||altijd|always|adv|
+ὥστε||zodat|so that|conj|
+ὅτι||1. dat 2. omdat|1. that 2. because|conj|
+ὅτε||wanneer|when|conj|
+ἡ ὕβρις|τῆς ὕβρεως|de hoogmoed|the arrogance, the hubris||ὑβρε-
+κελεύειν|κελεύω|bevelen|to order, to command||κελευ-
+πάλιν||opnieuw|again|adv|
+τότε||dan, toen|then|adv|
+φαίνειν|φαίνω|laten zien|to show||φαιν-
+κάλλιστος|καλλίστη, κάλλιστον|1. zeer mooi 2. (de) mooiste|1. very beautiful 2. the most beautiful||καλλιστ-
+κρίνειν|κρίνω|oordelen|to judge||κριν-
+αὐτίκα||dadelijk|immediately|adv|
+διά|+ acc.<br>+ gen.|door, wegens<br>door, doorheen|because of, on account of<br>through, throughout||
+ἀποκτείνειν|ἀποκτείνω|doden|to kill||ἀπο-κτειν-
+ὑπό|+ gen.|1. door (iemand) 2. onder (iets)|1. by (someone) 2. under (something)||
+ὁ ἑταῖρος|τοῦ ἑταίρου|de kameraad|the comrade, the companion||ἑταιρ-
+σῴζειν|σῴζω|redden|to save||σωζ-
+ἕκαστος|ἑκάστη, ἕκαστον|elk, ieder|each, every||ἑκαστ-
+παρέχειν|παρέχω|geven, bezorgen|to give, to provide||παρ-εχ-
+ἔξεστι(ν)|+ dat.|1. het is toegestaan (aan iemand) 2. het is mogelijk (voor iemand)|1. it is permitted (to someone) 2. it is possible (for someone)|unp|ἐξ-εσ-
+ἡ νίκη|τῆς νίκης|de overwinning|the victory||νικ-
+ὁ βίος|τοῦ βίου|het leven|the life||βι-
+δῆλος|δήλη, δῆλον|duidelijk|clear, obvious||δηλ-
+ἐν|+ dat.|in|in||
+σύν|+ dat.|samen met|together with||
+χαλεπός|χαλεπή, χαλεπόν|lastig, moeilijk|difficult, troublesome||χαλεπ-
+ὁ φόβος|τοῦ φόβου|de vrees|the fear||φοβ-
+φεύγειν|φεύγω|vluchten|to flee||φευγ-
+κατέχειν|κατέχω|tegenhouden|to hold back||κατ-εχ-
+ἡ θύρα|τῆς θύρας|de deur|the door||θυρ-
+νέος|νέα, νέον|1. nieuw 2. jong|1. new 2. young||νε-`.split('\n').map(l=>l.split('|'));
+const GTY={adv:['Adverb','Bijwoord'],conj:['Conjunction','Voegwoord'],unp:['Impersonal','Onpersoonlijk']};
+function greek(){vocab({name:'Greek Vocabulary',a:1,b:121,d:GRK,note:'The vocabulary comes from the Greek school book Mythoi. The complete word list (1–121) is available.',
+back:(v,nl)=>{const ty=v[4]?GTY[v[4]][nl?1:0]:'';return(v[1]?'<span class="fcl" style="font-size:24px">'+v[1]+'</span>':'')+'<span class="fct">'+(nl?v[2]:v[3])+'</span>'+(ty?'<span class="fcy">'+ty+'</span>':'')+(v[5]?'<span class="fcn">'+(nl?'stam ':'stem ')+v[5]+'</span>':'')}})}
+
+$('#cards').onclick=e=>{const t=e.target.closest('[data-i]');if(t)run(+t.dataset.i)};
+$('#back').onclick=home;
+
+/* ---- language: English (default) / Dutch ---- */
+let L=LS.get('paul2-lang')==='nl'?'nl':'en';
+const WORDS_NL=[...new Set('ambivalent efemeer obstinaat pretentieus eclectisch contradictie euforisch rigide nonchalant pedant ostentatief gedegen hypocriet simplistisch tegenstrijdig voorbarig weemoedig zelfgenoegzaam achterbaks bedaard bedrieglijk behoedzaam bekrompen beknopt beschroomd bezonnen dwingeland eigenzinnig eerzuchtig fanatiek fatalistisch gekunsteld gewetensvol goedgelovig hardnekkig heimelijk hoogmoedig ijdel ingetogen kleinzielig koppig laconiek lichtzinnig liefkozend loyaal listig mateloos minzaam naief onberispelijk onverschillig onvermijdelijk onzelfzuchtig overmoedig overbodig plechtig pompeus prikkelbaar rancuneus roekeloos schaamteloos scrupuleus spitsvondig spreekwoordelijk standvastig sluimerend stuurs subtiel theatraal tolerant treurig triviaal uitbundig uitzonderlijk ultiem vergankelijk vermetel verfijnd verwaand vluchtig weifelachtig wispelturig woordkarig zelfbewust bondig dubbelzinnig cynisch dogmatisch excentriek filosofisch grootmoedig hautain impulsief ironisch melancholiek meedogenloos onbevangen onstuimig ontembaar overtuigend raadselachtig schrijnend vastberaden verbijsterd vertrouwelijk welbespraakt wereldvreemd'.split(' '))],SENT_NL=["De wind droeg de geur van vers brood door de stille straat.", "Een kleine robot rolde over de keukenvloer op zoek naar een zoekgeraakte batterij.", "Elke ochtend liep zij naar de oude haven om de vissersboten te zien terugkomen.", "Snel leren typen vraagt geduld, oefening en een verrassend aantal koppen koffie.", "In de bibliotheek was het stil op het zachte omslaan van bladzijden en verre voetstappen na.", "Toen de storm eindelijk voorbij was, glinsterde het hele dal onder een heldere blauwe hemel.", "Hij pakte een klein schrift, twee boterhammen en een kaart die niemand anders kon lezen.", "Wolken dreven langzaam over de bergen terwijl het dorp zonder een geluid sliep.", "De onderzoeker mat elke druppel nauwkeurig af voordat hij die aan het gloeiende mengsel toevoegde.", "Een nieuwsgierige vos keek tussen het hoge gras door en verdween toen in het bos.", "Goede gewoontes bouw je stap voor stap op, lang voordat iemand ze opmerkt.", "De trein ratelde door de tunnel en kwam uit in een veld vol gele bloemen.", "Ze moest zo hard om de grap lachen dat haar thee bijna over de tafel liep.", "Onder de oude eik bouwden de kinderen een kasteel van takken en bladeren.", "De markt was vol mensen die prijzen vergeleken, fruit proefden en nieuwtjes uitwisselden.", "Om middernacht gingen de lichten van de stad een voor een aan als verspreide sterren.", "Hij oefende wekenlang hetzelfde lied tot zijn vingers elke noot uit het hoofd kenden.", "Het schip voer langs de vuurtoren net toen de eerste zonnestralen verschenen.", "Een vriendelijke buurman zette elke herfst een mand rijpe appels op de veranda.", "De puzzel leek eerst onmogelijk, maar langzaam kwamen er kleine patronen tevoorschijn.", "De winter kwam dit jaar vroeg en bedekte daken en wegen met zachte witte sneeuw.", "De kok proefde de soep, deed er een snufje zout bij en glimlachte tevreden.", "De regen tikte zachtjes tegen het raam terwijl de kat sliep in een warm plekje zon.", "Ze volgden het kronkelende pad omhoog en bleven staan om van het uitzicht te genieten.", "De oude klok in de gang sloeg twee keer en werd toen weer stil.", "Een dappere mus bouwde zijn nest in de hoek van het drukke station.", "Ze schreef haar doelen op een kaartje en droeg het een heel jaar in haar zak.", "De bakker op de hoek gaat voor zonsopgang open en vult de lucht met zoete warme geuren.", "Sterke teams luisteren goed, delen vrij hun ideeen en vieren samen kleine overwinningen.", "De astronaut zweefde bij het raam en zag de blauwe planeet onder zich draaien.", "Na een lange werkdag is er niets fijner dan een rustige wandeling langs de rivier.", "Het bootje deinde op en neer terwijl de golven zachtjes naar de kust rolden."];
+const WL=()=>L==='nl'?WORDS_NL:WORDS,SL=()=>L==='nl'?SENT_NL:SENT;
+const UN={digit:'cijfer',digits:'cijfers',word:'woord',words:'woorden',level:'niveau',levels:'niveaus',card:'kaart',cards:'kaarten',CPS:'KPS'};
+const unit=x=>x.replace(/\b(digits?|words?|levels?|cards?|CPS)\b/g,m=>UN[m]);
+const NLD={'← All tests':'← Alle onderdelen','Eight tests for your reflexes, memory and speed, plus Latin and Greek vocabulary trainers':'Acht onderdelen voor je reflexen, geheugen en snelheid, plus trainers voor Latijnse en Griekse woordenschat',
+'Reflexes':'Reflexen','Memory':'Geheugen','Speed & skill':'Snelheid & vaardigheid','Learn':'Leren',
+'Reaction Time':'Reactietijd','Click as soon as the screen turns green (5 tries)':'Klik zodra het scherm groen wordt (5 pogingen)',
+'Click Speed':'Kliksnelheid','How many clicks in 10 seconds':'Hoeveel klikken in 10 seconden',
+'Aim Trainer':'Richttrainer','Hit 20 targets as fast and as accurately as you can':'Raak 20 doelen zo snel en nauwkeurig mogelijk',
+'Number Memory':'Getallengeheugen','Remember longer and longer numbers':'Onthoud steeds langere getallen',
+'Word Memory':'Woordengeheugen','Say if each difficult word is new or one you have already seen':'Zeg of elk moeilijk woord nieuw is of je het al eerder hebt gezien',
+'Math Speed':'Rekensnelheid','Answer 10 quick math problems as fast as you can':'Beantwoord 10 rekensommen zo snel je kunt',
+'Sequence Memory':'Volgordegeheugen','Repeat a pattern of lighting tiles':'Herhaal een patroon van oplichtende tegels',
+'Typing Speed':'Typesnelheid','Type about 60 words. The text changes every time':'Typ ongeveer 60 woorden. De tekst is elke keer anders',
+'Latin Vocabulary':'Latijnse woordenschat','Greek Vocabulary':'Griekse woordenschat','Flashcards from the Mythoi school book':'Flashcards uit het schoolboek Mythoi','The vocabulary comes from the Greek school book Mythoi. The complete word list (1–121) is available.':'De woordenschat komt uit het Griekse schoolboek Mythoi. De volledige woordenlijst (1–121) is beschikbaar.','Flashcards from the Pegasus school book':'Flashcards uit het schoolboek Pegasus',
+'Not tried yet':'Nog niet geprobeerd','New best!':'Nieuw record!','Try again':'Opnieuw proberen',
+'Lightning fast':'Bliksemsnel','Great':'Geweldig','Good':'Goed','Average':'Gemiddeld','Slow. Keep practicing':'Traag. Blijf oefenen','Elite':'Elite','Fast':'Snel','Warm up and try again':'Warm je op en probeer opnieuw','Sharpshooter':'Scherpschutter','Keep practicing':'Blijf oefenen','Superb memory':'Uitstekend geheugen','Keep training':'Blijf trainen','Mental calculator':'Hoofdrekenaar','Lightning typist':'Bliksemsnelle typist',
+'Click to start':'Klik om te starten','Click when the screen turns green':'Klik zodra het scherm groen wordt','Wait for green…':'Wacht op groen…',"Don't click yet":'Nog niet klikken','Click!':'Klik!','Too soon!':'Te vroeg!','Click to try again':'Klik om het opnieuw te proberen',
+'Time':'Tijd','Clicks':'Klikken','Click here':'Klik hier','The timer starts on your first click':'De timer start bij je eerste klik','Keep clicking!':'Blijf klikken!','Targets':'Doelen','Misses':'Missers',
+'Level':'Niveau','What was the number?':'Wat was het getal?','A number appears and then disappears. Type it back. It gets one digit longer every level.':'Er verschijnt een getal dat daarna verdwijnt. Typ het terug. Elk niveau wordt het getal één cijfer langer.',
+'Lives':'Levens','Have you seen this word in this game?':'Heb je dit woord in dit spel al gezien?','Seen':'Gezien','New':'Nieuw',
+'Difficult words appear one at a time. Say whether you have seen each word before in this game or whether it is new. Three mistakes and you are out.':'Moeilijke woorden verschijnen één voor één. Zeg of je elk woord eerder in dit spel hebt gezien of dat het nieuw is. Na drie fouten ben je af.',
+'Question':'Vraag','Average:':'Gemiddeld:','per problem':'per som','Answer 10 quick problems (add, subtract, multiply, divide). Your time counts, and each wrong answer adds 3 seconds.':'Beantwoord 10 snelle sommen (optellen, aftrekken, vermenigvuldigen, delen). Je tijd telt, en elk fout antwoord kost 3 seconden extra.',
+'Watch':'Kijk','Your turn':'Jouw beurt','Tiles light up one at a time. Repeat the order by tapping them. Each level adds one more tile.':'Tegels lichten één voor één op. Herhaal de volgorde door erop te tikken. Elk niveau komt er één tegel bij.',
+'Accuracy':'Nauwkeurigheid','Start typing here…':'Begin hier met typen…','About 60 words appear and the text is different every time. The timer starts when you type your first letter. Wrong letters count against your accuracy, and your score is words per minute.':'Er verschijnen ongeveer 60 woorden en de tekst is elke keer anders. De timer start bij je eerste letter. Foute letters tellen mee in je nauwkeurigheid en je score is het aantal woorden per minuut.',
+'The vocabulary comes from the Dutch Latin school book Pegasus. At the moment only Pegasus 1: Latin vocabulary 601–688 is available.':'De woordenschat komt uit het Nederlandse Latijnse schoolboek Pegasus. Op dit moment is alleen Pegasus 1: Latijnse woordenschat 601–688 beschikbaar.',
+'From':'Van','To':'Tot','Shuffle the cards':'Schud de kaarten','Choose numbers between 601 and 688.':'Kies getallen tussen 601 en 688.','Cards left':'Kaarten over','Tap the card to flip':'Tik op de kaart om hem om te draaien','Review again':'Nog eens herhalen','I knew it':'Ik wist het','Done!':'Klaar!','Practise again':'Opnieuw oefenen'};
+const NLR=[[/^Choose numbers between (\d+) and (\d+)\.$/,'Kies getallen tussen $1 en $2.'],[/^(\d+) of (\d+) tests tried$/,'$1 van $2 onderdelen geprobeerd'],[/^Best: (.+)$/,(m,a)=>'Beste: '+unit(a)],[/^\d+(?:\.\d+)? (?:digits?|words?|levels?|cards?|CPS)$/,m=>unit(m)],
+[/^Click for the next try \((\d\/5)\)$/,'Klik voor de volgende poging ($1)'],[/^Your 5 tries: (.+)$/,'Je 5 pogingen: $1'],[/^(\d+) clicks in 10 seconds$/,'$1 klikken in 10 seconden'],
+[/^Average hit time (\d+) ms · (\d+) misses · (\d+)% accuracy\. Each miss adds 250 ms to your score\.$/,'Gemiddelde trefttijd $1 ms · $2 missers · $3% nauwkeurigheid. Elke misser voegt 250 ms toe aan je score.'],
+[/^The number was (\d+)\. You typed (\d+)\.$/,'Het getal was $1. Jij typte $2.'],[/^You ran out of lives\. You saw (\d+) different words\.$/,'Je hebt geen levens meer. Je zag $1 verschillende woorden.'],
+[/^(\d+\/\d+) correct · ([\d.]+) s plus (\d+) wrong × 3 s penalty$/,'$1 goed · $2 s plus $3 fout × 3 s straf'],[/^You repeated (\d+) steps? correctly before the first mistake\.$/,'Je herhaalde $1 stap(pen) goed vóór de eerste fout.'],
+[/^(\d+) words in ([\d.]+) s · accuracy (\d+)%$/,'$1 woorden in $2 s · nauwkeurigheid $3%'],[/^You reviewed (\d+) cards\. (\d+) needed another look\.$/,'Je hebt $1 kaarten doorgenomen. $2 hadden nog een herhaling nodig.']];
+function tr(s){if(L!=='nl')return s;const k=s.trim();if(!k)return s;let r=NLD[k];
+if(r===undefined)for(const[re,to]of NLR)if(re.test(k)){r=k.replace(re,to);break}
+return r===undefined?s:s.match(/^\s*/)[0]+r+s.match(/\s*$/)[0]}
+function txt(n){if(n.__o===undefined)n.__o=n.nodeValue;const v=tr(n.__o);if(n.nodeValue!==v)n.nodeValue=v}
+function fix(n){if(n.nodeType===3)return txt(n);if(n.nodeType!==1)return;
+const ph=e=>{if(e.__p===undefined)e.__p=e.placeholder;e.placeholder=tr(e.__p)};if(n.hasAttribute('placeholder'))ph(n);
+const w=document.createTreeWalker(n,4);let x;while(x=w.nextNode())txt(x);n.querySelectorAll('[placeholder]').forEach(ph)}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(fix))).observe($('#app'),{childList:true,subtree:true});
+function setLang(l){L=l;LS.set('paul2-lang',l);document.documentElement.lang=l;document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));cards();fix($('#app'))}
+document.querySelector('.lang').onclick=e=>{const b=e.target.closest('[data-l]');if(b)setLang(b.dataset.l)};
+setLang(L);
+</script>
+</body>
+</html>
